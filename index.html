@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Threads 網軍偵搜器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3a;
+    --accent: #ff3b5c;
+    --accent2: #ffb800;
+    --accent3: #00e5a0;
+    --text: #e8e8f0;
+    --muted: #7070a0;
+    --font-display: 'Syne', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-display);
+    min-height: 100vh;
+  }
+
+  .app {
+    min-height: 100vh;
+    padding: 40px 20px 100px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .app::before {
+    content: '';
+    position: fixed;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(255,59,92,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .app::after {
+    content: '';
+    position: fixed;
+    bottom: -200px; left: -200px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,229,160,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Header ── */
+  .header { margin-bottom: 48px; }
+
+  .header-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,59,92,0.12);
+    border: 1px solid rgba(255,59,92,0.3);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    color: var(--accent); text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .badge-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .header h1 {
+    font-size: clamp(32px, 7vw, 54px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .header h1 span { color: var(--accent); }
+
+  .header p {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.7;
+    font-family: var(--font-mono);
+    max-width: 500px;
+  }
+
+  /* ── Search ── */
+  .search-row {
+    display: flex;
+    margin-bottom: 32px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .search-prefix {
+    background: var(--surface);
+    padding: 0 18px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 16px;
+    display: flex; align-items: center;
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  #username-input {
+    flex: 1;
+    background: var(--surface);
+    border: none;
+    padding: 18px 16px;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 16px; font-weight: 700;
+    outline: none;
+    min-width: 0;
+    transition: background 0.2s;
+  }
+  #username-input::placeholder { color: var(--muted); font-weight: 400; }
+  #username-input:focus { background: var(--surface2); }
+  #username-input:disabled { opacity: 0.6; }
+
+  #scan-btn {
+    background: var(--accent);
+    border: none;
+    padding: 0 28px;
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 14px; font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+  }
+  #scan-btn:hover:not(:disabled) { background: #e0253e; }
+  #scan-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ── Steps ── */
+  .steps {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .step {
+    flex: 1;
+    padding: 12px 8px;
+    text-align: center;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    font-family: var(--font-mono);
+    transition: all 0.3s;
+  }
+  .step:last-child { border-right: none; }
+  .step-num { display: block; font-size: 15px; margin-bottom: 3px; }
+  .step.active { color: var(--accent); background: rgba(255,59,92,0.08); }
+  .step.done { color: var(--accent3); background: rgba(0,229,160,0.06); }
+
+  /* ── Loading ── */
+  .loading-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 24px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .spinner {
+    width: 48px; height: 48px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 20px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-title {
+    color: var(--accent);
+    font-size: 15px; font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .loading-sub {
+    color: var(--muted);
+    font-size: 12px;
+    font-family: var(--font-mono);
+  }
+
+  /* ── Error ── */
+  .error-box {
+    background: rgba(255,59,92,0.08);
+    border: 1px solid rgba(255,59,92,0.3);
+    border-radius: 12px;
+    padding: 18px 22px;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  /* ── Result card ── */
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    animation: fadeUp 0.4s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Profile strip */
+  .profile-strip {
+    display: flex; align-items: center; gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+    flex-wrap: wrap;
+  }
+  .avatar {
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+  .avatar img {
+    width: 100%; height: 100%;
+    border-radius: 50%; object-fit: cover;
+  }
+  .profile-info { flex: 1; min-width: 120px; }
+  .profile-name { font-weight: 700; font-size: 16px; }
+  .profile-handle { color: var(--muted); font-size: 13px; font-family: var(--font-mono); margin-top: 2px; }
+  .profile-stats { display: flex; gap: 20px; flex-shrink: 0; }
+  .stat { text-align: center; }
+  .stat-val { font-weight: 700; font-size: 15px; font-family: var(--font-mono); }
+  .stat-key { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+
+  /* Score section */
+  .score-section {
+    display: flex; align-items: center; gap: 28px;
+    padding: 32px 24px 24px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .score-ring-wrap { position: relative; flex-shrink: 0; }
+  .score-ring { width: 120px; height: 120px; transform: rotate(-90deg); }
+  .score-ring-bg { fill: none; stroke: var(--border); stroke-width: 8; }
+  .score-ring-fill {
+    fill: none; stroke-width: 8; stroke-linecap: round;
+    transition: stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1);
+  }
+  .score-number {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .score-val { font-size: 32px; font-weight: 800; line-height: 1; }
+  .score-max { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+
+  .score-verdict { flex: 1; min-width: 180px; }
+  .verdict-tag {
+    display: inline-block;
+    padding: 6px 14px; border-radius: 100px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .verdict-safe { background: rgba(0,229,160,0.15); color: var(--accent3); }
+  .verdict-suspicious { background: rgba(255,184,0,0.15); color: var(--accent2); }
+  .verdict-high { background: rgba(255,100,0,0.15); color: #ff6400; }
+  .verdict-confirmed { background: rgba(255,59,92,0.15); color: var(--accent); }
+  .verdict-text { font-size: 13px; line-height: 1.7; color: var(--muted); font-family: var(--font-mono); }
+
+  /* Dimensions */
+  .dimensions { padding: 24px; border-bottom: 1px solid var(--border); }
+  .section-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 18px;
+  }
+  .dim-item { margin-bottom: 18px; }
+  .dim-item:last-child { margin-bottom: 0; }
+  .dim-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 7px; }
+  .dim-name { font-size: 13px; font-weight: 700; }
+  .dim-score-text { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+  .dim-bar-bg { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .dim-bar-fill { height: 100%; border-radius: 99px; width: 0; transition: width 1s cubic-bezier(0.4,0,0.2,1) 0.2s; }
+  .dim-note { font-size: 11px; color: var(--muted); margin-top: 5px; font-family: var(--font-mono); line-height: 1.5; }
+
+  /* Analysis */
+  .analysis-section { padding: 24px; border-bottom: 1px solid var(--border); }
+  .analysis-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ai-badge {
+    background: var(--accent); color: #fff;
+    padding: 2px 6px; border-radius: 4px; font-size: 9px;
+  }
+  .analysis-text {
+    font-size: 13px; line-height: 1.9; color: var(--text);
+    font-family: var(--font-mono); white-space: pre-wrap;
+  }
+
+  /* Raw toggle */
+  .raw-section { padding: 14px 24px; background: var(--surface2); }
+  .raw-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); font-family: var(--font-mono); font-size: 11px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 4px 0; display: flex; align-items: center; gap: 6px;
+  }
+  .raw-btn:hover { color: var(--text); }
+  .raw-pre {
+    margin-top: 12px; padding: 16px;
+    background: var(--bg); border-radius: 8px;
+    font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+    overflow: auto; max-height: 280px;
+    white-space: pre-wrap; word-break: break-all;
+    display: none;
+  }
+  .raw-pre.open { display: block; }
+
+  /* Hidden utility */
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-badge">
+        <span class="badge-dot"></span>
+        網軍偵搜系統 v1.0
+      </div>
+      <h1>Threads<br /><span>網軍偵搜器</span></h1>
+      <p>輸入帳號名稱，系統將自動抓取公開資料，透過 AI 分析四大維度，給出網軍風險評分（0–100 分）。</p>
+    </div>
+
+    <!-- Search -->
+    <div class="search-row">
+      <div class="search-prefix">@</div>
+      <input id="username-input" type="text" placeholder="輸入 Threads 帳號名稱" autocomplete="off" autocapitalize="off" />
+      <button id="scan-btn">開始偵搜</button>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps hidden" id="steps">
+      <div class="step" id="step-1"><span class="step-num">1</span>抓取帳號</div>
+      <div class="step" id="step-2"><span class="step-num">2</span>讀取貼文</div>
+      <div class="step" id="step-3"><span class="step-num">3</span>AI 分析</div>
+      <div class="step" id="step-4"><span class="step-num">✓</span>完成</div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-box hidden" id="loading-box">
+      <div class="spinner"></div>
+      <div class="loading-title" id="loading-title">正在處理…</div>
+      <div class="loading-sub" id="loading-sub"></div>
+    </div>
+
+    <!-- Error -->
+    <div class="error-box hidden" id="error-box"></div>
+
+    <!-- Result -->
+    <div class="result-card hidden" id="result-card">
+
+      <!-- Profile -->
+      <div class="profile-strip">
+        <div class="avatar" id="avatar-wrap">👤</div>
+        <div class="profile-info">
+          <div class="profile-name" id="profile-name">—</div>
+          <div class="profile-handle" id="profile-handle">@—</div>
+        </div>
+        <div class="profile-stats">
+          <div class="stat">
+            <div class="stat-val" id="stat-followers">—</div>
+            <div class="stat-key">粉絲</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val" id="stat-following">—</div>
+            <div class="stat-key">追蹤</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val" id="stat-posts">—</div>
+            <div class="stat-key">貼文</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Score -->
+      <div class="score-section">
+        <div class="score-ring-wrap">
+          <svg class="score-ring" viewBox="0 0 120 120">
+            <circle class="score-ring-bg" cx="60" cy="60" r="52"/>
+            <circle class="score-ring-fill" id="score-ring-fill"
+              cx="60" cy="60" r="52"
+              stroke="#ff3b5c"
+              stroke-dasharray="326.726"
+              stroke-dashoffset="326.726"/>
+          </svg>
+          <div class="score-number">
+            <span class="score-val" id="score-val">0</span>
+            <span class="score-max">/ 100</span>
+          </div>
+        </div>
+        <div class="score-verdict">
+          <div class="verdict-tag" id="verdict-tag">—</div>
+          <div class="verdict-text" id="verdict-text">—</div>
+        </div>
+      </div>
+
+      <!-- Dimensions -->
+      <div class="dimensions">
+        <div class="section-title">各維度評分明細</div>
+        <div id="dim-network" class="dim-item">
+          <div class="dim-header">
+            <span class="dim-name">社交網絡與協同行為</span>
+            <span class="dim-score-text" id="dim-network-score">— / 35</span>
+          </div>
+          <div class="dim-bar-bg"><div class="dim-bar-fill" id="dim-network-bar" style="background:#ff3b5c"></div></div>
+          <div class="dim-note" id="dim-network-note"></div>
+        </div>
+        <div id="dim-content" class="dim-item">
+          <div class="dim-header">
+            <span class="dim-name">內容與文本特徵</span>
+            <span class="dim-score-text" id="dim-content-score">— / 30</span>
+          </div>
+          <div class="dim-bar-bg"><div class="dim-bar-fill" id="dim-content-bar" style="background:#ffb800"></div></div>
+          <div class="dim-note" id="dim-content-note"></div>
+        </div>
+        <div id="dim-activity" class="dim-item">
+          <div class="dim-header">
+            <span class="dim-name">活動與時間規律</span>
+            <span class="dim-score-text" id="dim-activity-score">— / 20</span>
+          </div>
+          <div class="dim-bar-bg"><div class="dim-bar-fill" id="dim-activity-bar" style="background:#00b4ff"></div></div>
+          <div class="dim-note" id="dim-activity-note"></div>
+        </div>
+        <div id="dim-profile" class="dim-item">
+          <div class="dim-header">
+            <span class="dim-name">帳號基本資料</span>
+            <span class="dim-score-text" id="dim-profile-score">— / 15</span>
+          </div>
+          <div class="dim-bar-bg"><div class="dim-bar-fill" id="dim-profile-bar" style="background:#00e5a0"></div></div>
+          <div class="dim-note" id="dim-profile-note"></div>
+        </div>
+      </div>
+
+      <!-- Analysis -->
+      <div class="analysis-section">
+        <div class="analysis-title">
+          分析摘要 <span class="ai-badge">AI</span>
+        </div>
+        <div class="analysis-text" id="analysis-text">—</div>
+      </div>
+
+      <!-- Raw data -->
+      <div class="raw-section">
+        <button class="raw-btn" id="raw-btn">▼ 原始資料</button>
+        <pre class="raw-pre" id="raw-pre"></pre>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ── 設定 ─────────────────────────────────────────────────────────
+const APIFY_TOKEN = "apify_api_icF2n2z9YPFtIrr64viKW0LTl0EZAh4wj7u3";
+const ACTOR_ID    = "automation-lab~threads-scraper";
+
+// ── 工具函式 ──────────────────────────────────────────────────────
+function fmtNum(n) {
+  if (n == null) return "?";
+  if (n >= 1e6) return (n/1e6).toFixed(1)+"M";
+  if (n >= 1e3) return (n/1e3).toFixed(1)+"K";
+  return String(n);
+}
+
+function scoreColor(s) {
+  if (s <= 30) return "#00e5a0";
+  if (s <= 60) return "#ffb800";
+  if (s <= 80) return "#ff6400";
+  return "#ff3b5c";
+}
+
+function verdictInfo(s) {
+  if (s <= 30) return { cls:"verdict-safe",      label:"正常使用者",   text:"該帳號呈現正常使用者的行為模式，無明顯可疑跡象。" };
+  if (s <= 60) return { cls:"verdict-suspicious", label:"部分可疑",     text:"具備部分機器人或目的性帳號特徵，建議持續觀察。" };
+  if (s <= 80) return { cls:"verdict-high",       label:"高度可疑",     text:"高度可疑，很可能為網軍工蜂帳號或自動化機器人。" };
+  return          { cls:"verdict-confirmed",   label:"幾乎確認為網軍", text:"行為模式嚴重違反自然人使用邏輯，強烈建議封鎖。" };
+}
+
+// ── UI 狀態管理 ────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+
+function setStep(n) {
+  // n: 1-4 = 執行中步驟, 0 = 隱藏
+  const stepsEl = $("steps");
+  if (n === 0) { stepsEl.classList.add("hidden"); return; }
+  stepsEl.classList.remove("hidden");
+  [1,2,3,4].forEach(i => {
+    const el = $(`step-${i}`);
+    el.className = "step";
+    if (i < n)  el.classList.add("done");
+    if (i === n) el.classList.add("active");
+  });
+  // Update step num icons for done steps
+  [1,2,3].forEach(i => {
+    const numEl = $(`step-${i}`).querySelector(".step-num");
+    numEl.textContent = i < n ? "✓" : String(i);
+  });
+}
+
+function setLoading(title, sub) {
+  if (!title) { $("loading-box").classList.add("hidden"); return; }
+  $("loading-box").classList.remove("hidden");
+  $("loading-title").textContent = title;
+  $("loading-sub").textContent = sub || "";
+}
+
+function setError(msg) {
+  const el = $("error-box");
+  if (!msg) { el.classList.add("hidden"); return; }
+  el.classList.remove("hidden");
+  el.textContent = "⚠ " + msg;
+}
+
+function setScanning(on) {
+  $("scan-btn").disabled = on;
+  $("username-input").disabled = on;
+  $("scan-btn").textContent = on ? "分析中…" : "開始偵搜";
+}
+
+// ── Apify 呼叫（polling）────────────────────────────────────────────
+async function apifyRun(input) {
+  // 1. 啟動
+  const r1 = await fetch(
+    `https://api.apify.com/v2/acts/${ACTOR_ID}/runs?token=${APIFY_TOKEN}`,
+    { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(input) }
+  );
+  if (!r1.ok) throw new Error(`Apify 啟動失敗 (${r1.status})`);
+  const d1 = await r1.json();
+  const runId     = d1?.data?.id;
+  const datasetId = d1?.data?.defaultDatasetId;
+  if (!runId) throw new Error("無法取得 Apify run ID");
+
+  // 2. 輪詢直到完成（最多 120s）
+  for (let t = 0; t < 120; t += 4) {
+    await new Promise(r => setTimeout(r, 4000));
+    const r2 = await fetch(`https://api.apify.com/v2/acts/${ACTOR_ID}/runs/${runId}?token=${APIFY_TOKEN}`);
+    if (!r2.ok) continue;
+    const d2 = await r2.json();
+    const status = d2?.data?.status;
+    if (status === "SUCCEEDED") break;
+    if (["FAILED","ABORTED","TIMED-OUT"].includes(status))
+      throw new Error(`Apify 執行失敗，狀態：${status}`);
+  }
+
+  // 3. 讀取資料
+  const r3 = await fetch(
+    `https://api.apify.com/v2/datasets/${datasetId}/items?token=${APIFY_TOKEN}&limit=30`
+  );
+  if (!r3.ok) throw new Error("讀取 Apify 資料集失敗");
+  return r3.json();
+}
+
+// ── Claude AI 分析 ─────────────────────────────────────────────────
+async function analyzeWithClaude(profile, posts) {
+  const prompt = `你是一位社群平台假帳號（網軍）偵測專家，請根據以下 Threads 帳號資料，依照四大判斷維度進行評分，並給出總分。
+
+## 帳號資料
+${JSON.stringify(profile, null, 2)}
+
+## 近期貼文（最多 20 篇）
+${JSON.stringify((posts||[]).slice(0,20), null, 2)}
+
+## 評分標準（滿分 100）
+
+### 一、社交網絡與協同行為（35分）
+- 追蹤/粉絲比例是否極端（例如追蹤多、粉絲極少）：0-10分
+- 互動行為是否單一集中於特定目標：0-10分
+- 是否有協同作戰跡象（需推斷）：0-15分
+
+### 二、內容與文本特徵（30分）
+- 貼文是否高度重複、罐頭化或AI生成感：0-15分
+- 帳號內容是否 90% 集中於單一議題：0-10分
+- 是否頻繁夾帶特定立場字眼或外部連結：0-5分
+
+### 三、活動與時間規律（20分）
+- 發文頻率與時間是否異常：0-10分
+- 以轉發/按讚為主，幾乎無原創：0-10分
+
+### 四、帳號基本資料（15分）
+- 帳號名稱是否含亂碼數字：0-5分
+- 頭像/自介是否空白或異常：0-5分
+- 追蹤比例是否極端或帳號極新：0-5分
+
+## 輸出格式（必須嚴格回傳以下 JSON，不要有任何其他文字或 markdown）
+{"totalScore":數字,"dimensions":{"network":{"score":數字,"max":35,"note":"一句話說明"},"content":{"score":數字,"max":30,"note":"一句話說明"},"activity":{"score":數字,"max":20,"note":"一句話說明"},"profile":{"score":數字,"max":15,"note":"一句話說明"}},"analysis":"3-5句完整的中文分析，說明最關鍵的可疑跡象或正常跡象"}`;
+
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1000,
+      messages: [{ role:"user", content: prompt }]
+    })
+  });
+  if (!res.ok) throw new Error("Claude API 呼叫失敗");
+  const data = await res.json();
+  const text = data.content?.[0]?.text || "";
+  const clean = text.replace(/```json|```/g,"").trim();
+  return JSON.parse(clean);
+}
+
+// ── 渲染結果 ───────────────────────────────────────────────────────
+function renderResult(profile, posts, ai) {
+  // Profile
+  if (profile.profilePicUrl) {
+    $("avatar-wrap").innerHTML = `<img src="${profile.profilePicUrl}" alt="" onerror="this.parentNode.textContent='👤'" />`;
+  } else {
+    $("avatar-wrap").textContent = "👤";
+  }
+  $("profile-name").textContent   = profile.fullName || profile.username || "—";
+  $("profile-handle").textContent = "@" + (profile.username||"—") + (profile.isVerified ? " ✓" : "");
+  $("stat-followers").textContent = fmtNum(profile.followerCount);
+  $("stat-following").textContent = fmtNum(profile.followingCount);
+  $("stat-posts").textContent     = String((posts||[]).length);
+
+  // Score ring
+  const score = ai.totalScore || 0;
+  const circ  = 2 * Math.PI * 52; // ≈ 326.726
+  const fill  = $("score-ring-fill");
+  fill.setAttribute("stroke", scoreColor(score));
+  fill.setAttribute("stroke-dasharray",  circ);
+  fill.setAttribute("stroke-dashoffset", circ); // start at 0
+  $("score-val").textContent = score;
+  $("score-val").style.color = scoreColor(score);
+  // Animate after paint
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      fill.setAttribute("stroke-dashoffset", circ - (score/100)*circ);
+    }, 80);
+  });
+
+  // Verdict
+  const v = verdictInfo(score);
+  const vTag = $("verdict-tag");
+  vTag.className = "verdict-tag " + v.cls;
+  vTag.textContent = v.label;
+  $("verdict-text").textContent = v.text;
+
+  // Dimensions
+  const dims = [
+    { key:"network",  scoreId:"dim-network-score",  barId:"dim-network-bar",  noteId:"dim-network-note",  max:35 },
+    { key:"content",  scoreId:"dim-content-score",  barId:"dim-content-bar",  noteId:"dim-content-note",  max:30 },
+    { key:"activity", scoreId:"dim-activity-score", barId:"dim-activity-bar", noteId:"dim-activity-note", max:20 },
+    { key:"profile",  scoreId:"dim-profile-score",  barId:"dim-profile-bar",  noteId:"dim-profile-note",  max:15 },
+  ];
+  dims.forEach(d => {
+    const dim = ai.dimensions?.[d.key];
+    if (!dim) return;
+    $(d.scoreId).textContent = `${dim.score} / ${d.max}`;
+    $(d.noteId).textContent  = dim.note || "";
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        $(d.barId).style.width = `${(dim.score/d.max)*100}%`;
+      }, 200);
+    });
+  });
+
+  // Analysis
+  $("analysis-text").textContent = ai.analysis || "—";
+
+  // Raw
+  $("raw-pre").textContent = JSON.stringify({ profile, posts:(posts||[]).slice(0,3) }, null, 2);
+
+  // Show card
+  $("result-card").classList.remove("hidden");
+}
+
+// ── 主流程 ────────────────────────────────────────────────────────
+async function handleScan() {
+  const raw = $("username-input").value.trim();
+  if (!raw) { setError("請輸入帳號名稱"); return; }
+  const handle = raw.replace(/^@/, "");
+
+  setError(null);
+  $("result-card").classList.add("hidden");
+  setScanning(true);
+
+  let profile = null, posts = null;
+
+  try {
+    // Step 1: profile
+    setStep(1);
+    setLoading("正在抓取帳號資料…", "透過 Apify 取得公開帳號資訊");
+    const profileItems = await apifyRun({ mode:"profile", usernames:[handle], maxPosts:0 });
+    profile = profileItems?.[0];
+    if (!profile) throw new Error(`找不到帳號 @${handle}，請確認帳號名稱是否正確`);
+
+    // Step 2: posts
+    setStep(2);
+    setLoading("正在讀取近期貼文…", "抓取最近 25 篇貼文與互動數據");
+    posts = await apifyRun({ mode:"posts", usernames:[handle], maxPosts:25 });
+
+    // Step 3: AI
+    setStep(3);
+    setLoading("AI 正在分析中…", "對照四大維度計算風險評分");
+    const ai = await analyzeWithClaude(profile, posts);
+
+    // Done
+    setStep(4);
+    setLoading(null);
+    renderResult(profile, posts, ai);
+
+  } catch(e) {
+    setStep(0);
+    setLoading(null);
+    setError(e.message || "未知錯誤，請稍後再試");
+  } finally {
+    setScanning(false);
+  }
+}
+
+// ── 事件綁定 ──────────────────────────────────────────────────────
+$("scan-btn").addEventListener("click", handleScan);
+$("username-input").addEventListener("keydown", e => {
+  if (e.key === "Enter" && !$("scan-btn").disabled) handleScan();
+});
+$("raw-btn").addEventListener("click", () => {
+  const pre = $("raw-pre");
+  const open = pre.classList.toggle("open");
+  $("raw-btn").textContent = (open ? "▲" : "▼") + " 原始資料";
+});
+</script>
+</body>
+</html>
