@@ -15,178 +15,67 @@
     --font-display: 'Syne', sans-serif; --font-mono: 'DM Mono', monospace;
   }
   body { background: var(--bg); color: var(--text); font-family: var(--font-display); min-height: 100vh; }
-
   .app { min-height: 100vh; padding: 40px 20px 100px; position: relative; overflow: hidden; }
-  .app::before {
-    content: ''; position: fixed; top: -200px; right: -200px;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(255,59,92,0.08) 0%, transparent 70%);
-    pointer-events: none; z-index: 0;
-  }
-  .app::after {
-    content: ''; position: fixed; bottom: -200px; left: -200px;
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(0,229,160,0.06) 0%, transparent 70%);
-    pointer-events: none; z-index: 0;
-  }
+  .app::before { content: ''; position: fixed; top: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(255,59,92,0.08) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+  .app::after { content: ''; position: fixed; bottom: -200px; left: -200px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,229,160,0.06) 0%, transparent 70%); pointer-events: none; z-index: 0; }
   .container { max-width: 720px; margin: 0 auto; position: relative; z-index: 1; }
 
-  /* ── Setup Screen ── */
-  .setup-screen {
-    min-height: 100vh; display: flex; align-items: center; justify-content: center;
-    padding: 40px 20px;
-  }
-  .setup-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 20px; padding: 40px 32px; max-width: 480px; width: 100%;
-    animation: fadeUp 0.4s ease;
-  }
+  .setup-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+  .setup-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 40px 32px; max-width: 480px; width: 100%; animation: fadeUp 0.4s ease; }
   .setup-icon { font-size: 40px; margin-bottom: 20px; }
   .setup-card h2 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
   .setup-card h2 span { color: var(--accent); }
   .setup-card p { color: var(--muted); font-size: 13px; font-family: var(--font-mono); line-height: 1.7; margin-bottom: 28px; }
-  .setup-label {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: block;
-  }
-  .setup-input {
-    width: 100%; background: var(--bg); border: 1px solid var(--border);
-    border-radius: 10px; padding: 14px 16px; color: var(--text);
-    font-family: var(--font-mono); font-size: 13px; outline: none;
-    transition: border-color 0.2s; margin-bottom: 16px;
-  }
+  .setup-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: block; }
+  .setup-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; color: var(--text); font-family: var(--font-mono); font-size: 13px; outline: none; transition: border-color 0.2s; margin-bottom: 16px; }
   .setup-input:focus { border-color: var(--accent); }
-  .setup-btn {
-    width: 100%; background: var(--accent); border: none; border-radius: 10px;
-    padding: 16px; color: #fff; font-family: var(--font-display);
-    font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s;
-  }
+  .setup-btn { width: 100%; background: var(--accent); border: none; border-radius: 10px; padding: 16px; color: #fff; font-family: var(--font-display); font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
   .setup-btn:hover { background: #e0253e; }
-  .setup-hint {
-    margin-top: 16px; font-size: 11px; color: var(--muted);
-    font-family: var(--font-mono); line-height: 1.6; text-align: center;
-  }
+  .setup-hint { margin-top: 16px; font-size: 11px; color: var(--muted); font-family: var(--font-mono); line-height: 1.6; text-align: center; }
   .setup-hint a { color: var(--accent); text-decoration: none; }
 
-  /* ── Header ── */
   .header { margin-bottom: 40px; }
   .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-  .header-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(255,59,92,0.12); border: 1px solid rgba(255,59,92,0.3);
-    border-radius: 100px; padding: 6px 14px;
-    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
-    color: var(--accent); text-transform: uppercase; margin-bottom: 20px;
-  }
-  .badge-dot {
-    width: 6px; height: 6px; background: var(--accent); border-radius: 50%;
-    animation: pulse 1.5s ease-in-out infinite; flex-shrink: 0;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.8); }
-  }
+  .header-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,59,92,0.12); border: 1px solid rgba(255,59,92,0.3); border-radius: 100px; padding: 6px 14px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: var(--accent); text-transform: uppercase; margin-bottom: 20px; }
+  .badge-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; flex-shrink: 0; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
   .header h1 { font-size: clamp(30px, 7vw, 52px); font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; }
   .header h1 span { color: var(--accent); }
   .header p { margin-top: 12px; color: var(--muted); font-size: 13px; line-height: 1.7; font-family: var(--font-mono); }
-
-  /* Settings button */
-  .settings-btn {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; padding: 10px 14px; color: var(--muted);
-    font-family: var(--font-mono); font-size: 12px; cursor: pointer;
-    transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
-    margin-top: 4px;
-  }
+  .settings-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; color: var(--muted); font-family: var(--font-mono); font-size: 12px; cursor: pointer; transition: all 0.2s; white-space: nowrap; flex-shrink: 0; margin-top: 4px; }
   .settings-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* ── Search ── */
-  .search-row {
-    display: flex; margin-bottom: 32px;
-    border-radius: 14px; overflow: hidden; border: 1px solid var(--border);
-  }
-  .search-prefix {
-    background: var(--surface); padding: 0 18px; color: var(--muted);
-    font-family: var(--font-mono); font-size: 16px;
-    display: flex; align-items: center; border-right: 1px solid var(--border); flex-shrink: 0;
-  }
-  #username-input {
-    flex: 1; background: var(--surface); border: none;
-    padding: 18px 16px; color: var(--text);
-    font-family: var(--font-display); font-size: 16px; font-weight: 700;
-    outline: none; min-width: 0; transition: background 0.2s;
-  }
+  .search-row { display: flex; margin-bottom: 32px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); }
+  .search-prefix { background: var(--surface); padding: 0 18px; color: var(--muted); font-family: var(--font-mono); font-size: 16px; display: flex; align-items: center; border-right: 1px solid var(--border); flex-shrink: 0; }
+  #username-input { flex: 1; background: var(--surface); border: none; padding: 18px 16px; color: var(--text); font-family: var(--font-display); font-size: 16px; font-weight: 700; outline: none; min-width: 0; transition: background 0.2s; }
   #username-input::placeholder { color: var(--muted); font-weight: 400; }
   #username-input:focus { background: var(--surface2); }
   #username-input:disabled { opacity: 0.6; }
-  #scan-btn {
-    background: var(--accent); border: none; padding: 0 24px; color: #fff;
-    font-family: var(--font-display); font-size: 14px; font-weight: 700;
-    cursor: pointer; transition: background 0.2s; white-space: nowrap;
-    letter-spacing: 0.04em; flex-shrink: 0;
-  }
+  #scan-btn { background: var(--accent); border: none; padding: 0 24px; color: #fff; font-family: var(--font-display); font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; white-space: nowrap; letter-spacing: 0.04em; flex-shrink: 0; }
   #scan-btn:hover:not(:disabled) { background: #e0253e; }
   #scan-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  /* ── Steps ── */
-  .steps {
-    display: flex; border: 1px solid var(--border); border-radius: 12px;
-    overflow: hidden; margin-bottom: 28px;
-  }
-  .step {
-    flex: 1; padding: 12px 6px; text-align: center;
-    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--muted);
-    background: var(--surface); border-right: 1px solid var(--border);
-    font-family: var(--font-mono); transition: all 0.3s;
-  }
+  .steps { display: flex; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 28px; }
+  .step { flex: 1; padding: 12px 6px; text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--surface); border-right: 1px solid var(--border); font-family: var(--font-mono); transition: all 0.3s; }
   .step:last-child { border-right: none; }
   .step-num { display: block; font-size: 15px; margin-bottom: 3px; }
   .step.active { color: var(--accent); background: rgba(255,59,92,0.08); }
   .step.done { color: var(--accent3); background: rgba(0,229,160,0.06); }
 
-  /* ── Loading ── */
-  .loading-box {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 48px 24px; text-align: center; margin-bottom: 24px;
-  }
-  .spinner {
-    width: 48px; height: 48px; border: 3px solid var(--border);
-    border-top-color: var(--accent); border-radius: 50%;
-    animation: spin 0.8s linear infinite; margin: 0 auto 20px;
-  }
+  .loading-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px 24px; text-align: center; margin-bottom: 24px; }
+  .spinner { width: 48px; height: 48px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 20px; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-title { color: var(--accent); font-size: 15px; font-weight: 700; margin-bottom: 6px; }
   .loading-sub { color: var(--muted); font-size: 12px; font-family: var(--font-mono); }
+  .loading-timer { color: var(--border); font-size: 11px; font-family: var(--font-mono); margin-top: 10px; }
 
-  /* ── Error ── */
-  .error-box {
-    background: rgba(255,59,92,0.08); border: 1px solid rgba(255,59,92,0.3);
-    border-radius: 12px; padding: 18px 22px; color: var(--accent);
-    font-family: var(--font-mono); font-size: 13px; line-height: 1.6; margin-bottom: 24px;
-  }
+  .error-box { background: rgba(255,59,92,0.08); border: 1px solid rgba(255,59,92,0.3); border-radius: 12px; padding: 18px 22px; color: var(--accent); font-family: var(--font-mono); font-size: 13px; line-height: 1.6; margin-bottom: 24px; word-break: break-all; }
 
-  /* ── Result card ── */
-  .result-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 20px; overflow: hidden; animation: fadeUp 0.4s ease;
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  .result-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; animation: fadeUp 0.4s ease; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-  .profile-strip {
-    display: flex; align-items: center; gap: 16px;
-    padding: 20px 24px; border-bottom: 1px solid var(--border);
-    background: var(--surface2); flex-wrap: wrap;
-  }
-  .avatar {
-    width: 54px; height: 54px; border-radius: 50%;
-    border: 2px solid var(--border); flex-shrink: 0;
-    background: var(--border); display: flex; align-items: center;
-    justify-content: center; font-size: 24px; overflow: hidden;
-  }
+  .profile-strip { display: flex; align-items: center; gap: 16px; padding: 20px 24px; border-bottom: 1px solid var(--border); background: var(--surface2); flex-wrap: wrap; }
+  .avatar { width: 54px; height: 54px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 24px; overflow: hidden; }
   .avatar img { width: 100%; height: 100%; object-fit: cover; }
   .profile-info { flex: 1; min-width: 120px; }
   .profile-name { font-weight: 700; font-size: 16px; }
@@ -196,10 +85,7 @@
   .stat-val { font-weight: 700; font-size: 15px; font-family: var(--font-mono); }
   .stat-key { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
 
-  .score-section {
-    display: flex; align-items: center; gap: 28px;
-    padding: 32px 24px 24px; border-bottom: 1px solid var(--border); flex-wrap: wrap;
-  }
+  .score-section { display: flex; align-items: center; gap: 28px; padding: 32px 24px 24px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
   .score-ring-wrap { position: relative; flex-shrink: 0; }
   .score-ring { width: 120px; height: 120px; transform: rotate(-90deg); }
   .score-ring-bg { fill: none; stroke: var(--border); stroke-width: 8; }
@@ -207,13 +93,8 @@
   .score-number { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
   .score-val { font-size: 32px; font-weight: 800; line-height: 1; }
   .score-max { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
-
   .score-verdict { flex: 1; min-width: 180px; }
-  .verdict-tag {
-    display: inline-block; padding: 6px 14px; border-radius: 100px;
-    font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
-    text-transform: uppercase; margin-bottom: 10px;
-  }
+  .verdict-tag { display: inline-block; padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
   .verdict-safe { background: rgba(0,229,160,0.15); color: var(--accent3); }
   .verdict-suspicious { background: rgba(255,184,0,0.15); color: var(--accent2); }
   .verdict-high { background: rgba(255,100,0,0.15); color: #ff6400; }
@@ -241,13 +122,11 @@
   .raw-btn:hover { color: var(--text); }
   .raw-pre { margin-top: 12px; padding: 16px; background: var(--bg); border-radius: 8px; font-family: var(--font-mono); font-size: 10px; color: var(--muted); overflow: auto; max-height: 280px; white-space: pre-wrap; word-break: break-all; display: none; }
   .raw-pre.open { display: block; }
-
   .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
-<!-- ── Setup Screen ── -->
 <div class="setup-screen" id="setup-screen">
   <div class="setup-card">
     <div class="setup-icon">🔑</div>
@@ -258,16 +137,13 @@
     <button class="setup-btn" id="setup-save-btn">儲存並開始使用</button>
     <div class="setup-hint">
       免費申請：<a href="https://console.apify.com/sign-up" target="_blank">apify.com</a>
-      → Settings → Integrations → API tokens<br/>
-      Token 儲存於瀏覽器 localStorage，關閉頁面後仍有效。
+      → Settings → Integrations → API tokens
     </div>
   </div>
 </div>
 
-<!-- ── Main App ── -->
 <div class="app hidden" id="main-app">
   <div class="container">
-
     <div class="header">
       <div class="header-top">
         <div>
@@ -296,6 +172,7 @@
       <div class="spinner"></div>
       <div class="loading-title" id="loading-title">正在處理…</div>
       <div class="loading-sub" id="loading-sub"></div>
+      <div class="loading-timer" id="loading-timer"></div>
     </div>
 
     <div class="error-box hidden" id="error-box"></div>
@@ -366,7 +243,6 @@
         <pre class="raw-pre" id="raw-pre"></pre>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -374,13 +250,11 @@
 const ACTOR_ID = "automation-lab~threads-scraper";
 const TOKEN_KEY = "apify_token";
 
-// ── Token 管理 ────────────────────────────────────────────────────
 function getToken() { return localStorage.getItem(TOKEN_KEY) || ""; }
 function saveToken(t) { localStorage.setItem(TOKEN_KEY, t.trim()); }
 
 function initScreen() {
-  const token = getToken();
-  if (token) {
+  if (getToken()) {
     document.getElementById("setup-screen").classList.add("hidden");
     document.getElementById("main-app").classList.remove("hidden");
   } else {
@@ -404,7 +278,7 @@ document.getElementById("settings-btn").addEventListener("click", () => {
   document.getElementById("setup-token-input").value = getToken();
 });
 
-// ── 工具函式 ──────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
 function fmtNum(n) {
   if (n == null) return "?";
   if (n >= 1e6) return (n/1e6).toFixed(1)+"M";
@@ -423,9 +297,7 @@ function verdictInfo(s) {
   if (s <= 80) return { cls:"verdict-high",       label:"高度可疑",       text:"高度可疑，很可能為網軍工蜂帳號或自動化機器人。" };
   return               { cls:"verdict-confirmed", label:"幾乎確認為網軍", text:"行為模式嚴重違反自然人使用邏輯，強烈建議封鎖。" };
 }
-const $ = id => document.getElementById(id);
 
-// ── UI 控制 ────────────────────────────────────────────────────────
 function setStep(n) {
   const el = $("steps");
   if (n === 0) { el.classList.add("hidden"); return; }
@@ -439,7 +311,7 @@ function setStep(n) {
   });
 }
 function setLoading(title, sub) {
-  if (!title) { $("loading-box").classList.add("hidden"); return; }
+  if (!title) { $("loading-box").classList.add("hidden"); clearTimer(); return; }
   $("loading-box").classList.remove("hidden");
   $("loading-title").textContent = title;
   $("loading-sub").textContent = sub || "";
@@ -456,9 +328,27 @@ function setScanning(on) {
   $("scan-btn").textContent = on ? "分析中…" : "開始偵搜";
 }
 
-// ── Apify 呼叫（polling）────────────────────────────────────────────
+// 計時器
+let timerInterval = null;
+function startTimer() {
+  clearTimer();
+  let sec = 0;
+  $("loading-timer").textContent = "";
+  timerInterval = setInterval(() => {
+    sec++;
+    $("loading-timer").textContent = `已等待 ${sec} 秒…`;
+  }, 1000);
+}
+function clearTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  if ($("loading-timer")) $("loading-timer").textContent = "";
+}
+
+// ── Apify 呼叫（polling，2秒間隔）────────────────────────────────
 async function apifyRun(input) {
   const token = getToken();
+
+  // 啟動
   const r1 = await fetch(
     `https://api.apify.com/v2/acts/${ACTOR_ID}/runs?token=${token}`,
     { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(input) }
@@ -468,27 +358,37 @@ async function apifyRun(input) {
     throw new Error(`Apify 啟動失敗 (${r1.status})：${txt}`);
   }
   const d1 = await r1.json();
-  const runId = d1?.data?.id;
+  const runId     = d1?.data?.id;
   const datasetId = d1?.data?.defaultDatasetId;
-  if (!runId) throw new Error("無法取得 Apify run ID");
+  if (!runId) throw new Error("無法取得 run ID，請確認 Token 是否有效");
 
-  for (let t = 0; t < 120; t += 4) {
-    await new Promise(r => setTimeout(r, 4000));
-    const r2 = await fetch(`https://api.apify.com/v2/acts/${ACTOR_ID}/runs/${runId}?token=${token}`);
-    if (!r2.ok) continue;
-    const d2 = await r2.json();
-    const status = d2?.data?.status;
-    if (status === "SUCCEEDED") break;
-    if (["FAILED","ABORTED","TIMED-OUT"].includes(status))
-      throw new Error(`Apify 執行失敗，狀態：${status}`);
+  // Polling：每 3 秒查一次，最多等 150 秒
+  let status = "";
+  for (let t = 0; t < 150; t += 3) {
+    await new Promise(r => setTimeout(r, 3000));
+    try {
+      const r2 = await fetch(`https://api.apify.com/v2/acts/${ACTOR_ID}/runs/${runId}?token=${token}`);
+      if (r2.ok) {
+        const d2 = await r2.json();
+        status = d2?.data?.status || "";
+        if (status === "SUCCEEDED") break;
+        if (["FAILED","ABORTED","TIMED-OUT"].includes(status))
+          throw new Error(`Apify 執行失敗，狀態：${status}`);
+      }
+    } catch(e) {
+      if (e.message.includes("Apify")) throw e;
+      // 網路暫時失敗，繼續 polling
+    }
   }
+  if (status !== "SUCCEEDED") throw new Error("Apify 執行逾時，請稍後再試");
 
+  // 讀資料
   const r3 = await fetch(`https://api.apify.com/v2/datasets/${datasetId}/items?token=${token}&limit=30`);
-  if (!r3.ok) throw new Error("讀取 Apify 資料集失敗");
+  if (!r3.ok) throw new Error("讀取資料集失敗");
   return r3.json();
 }
 
-// ── Claude AI 分析 ─────────────────────────────────────────────────
+// ── Claude AI ─────────────────────────────────────────────────────
 async function analyzeWithClaude(profile, posts) {
   const prompt = `你是一位社群平台假帳號（網軍）偵測專家，請根據以下 Threads 帳號資料，依照四大判斷維度進行評分，並給出總分。
 
@@ -499,11 +399,10 @@ ${JSON.stringify(profile, null, 2)}
 ${JSON.stringify((posts||[]).slice(0,20), null, 2)}
 
 ## 評分標準（滿分 100）
-
 ### 一、社交網絡與協同行為（35分）
-- 追蹤/粉絲比例是否極端（例如追蹤多、粉絲極少）：0-10分
+- 追蹤/粉絲比例是否極端：0-10分
 - 互動行為是否單一集中於特定目標：0-10分
-- 是否有協同作戰跡象（需推斷）：0-15分
+- 是否有協同作戰跡象：0-15分
 
 ### 二、內容與文本特徵（30分）
 - 貼文是否高度重複、罐頭化或AI生成感：0-15分
@@ -519,33 +418,33 @@ ${JSON.stringify((posts||[]).slice(0,20), null, 2)}
 - 頭像/自介是否空白或異常：0-5分
 - 追蹤比例是否極端或帳號極新：0-5分
 
-## 輸出格式（必須嚴格回傳以下 JSON，不要有任何其他文字或 markdown 符號）
-{"totalScore":數字,"dimensions":{"network":{"score":數字,"max":35,"note":"一句話說明"},"content":{"score":數字,"max":30,"note":"一句話說明"},"activity":{"score":數字,"max":20,"note":"一句話說明"},"profile":{"score":數字,"max":15,"note":"一句話說明"}},"analysis":"3-5句完整的中文分析"}`;
+## 輸出格式（只回傳 JSON，不要任何其他文字或 markdown）
+{"totalScore":數字,"dimensions":{"network":{"score":數字,"max":35,"note":"一句話"},"content":{"score":數字,"max":30,"note":"一句話"},"activity":{"score":數字,"max":20,"note":"一句話"},"profile":{"score":數字,"max":15,"note":"一句話"}},"analysis":"3-5句中文分析"}`;
 
   const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1000,
-      messages: [{ role:"user", content: prompt }]
+      model:"claude-sonnet-4-20250514",
+      max_tokens:1000,
+      messages:[{role:"user", content:prompt}]
     })
   });
-  if (!res.ok) throw new Error("Claude API 呼叫失敗");
+  if (!res.ok) throw new Error(`Claude API 失敗 (${res.status})`);
   const data = await res.json();
   const text = data.content?.[0]?.text || "";
   return JSON.parse(text.replace(/```json|```/g,"").trim());
 }
 
-// ── 渲染結果 ────────────────────────────────────────────────────────
+// ── 渲染 ─────────────────────────────────────────────────────────
 function renderResult(profile, posts, ai) {
   if (profile.profilePicUrl) {
-    $("avatar-wrap").innerHTML = `<img src="${profile.profilePicUrl}" alt="" onerror="this.parentNode.textContent='👤'" />`;
+    $("avatar-wrap").innerHTML = `<img src="${profile.profilePicUrl}" alt="" onerror="this.parentNode.textContent='👤'"/>`;
   } else {
     $("avatar-wrap").textContent = "👤";
   }
   $("profile-name").textContent   = profile.fullName || profile.username || "—";
-  $("profile-handle").textContent = "@" + (profile.username||"—") + (profile.isVerified ? " ✓" : "");
+  $("profile-handle").textContent = "@"+(profile.username||"—")+(profile.isVerified?" ✓":"");
   $("stat-followers").textContent = fmtNum(profile.followerCount);
   $("stat-following").textContent = fmtNum(profile.followingCount);
   $("stat-posts").textContent     = String((posts||[]).length);
@@ -555,35 +454,29 @@ function renderResult(profile, posts, ai) {
   const fill  = $("score-ring-fill");
   fill.setAttribute("stroke", scoreColor(score));
   fill.setAttribute("stroke-dashoffset", circ);
-  $("score-val").textContent  = score;
-  $("score-val").style.color  = scoreColor(score);
-  requestAnimationFrame(() => setTimeout(() => {
-    fill.setAttribute("stroke-dashoffset", circ - (score/100)*circ);
-  }, 80));
+  $("score-val").textContent = score;
+  $("score-val").style.color = scoreColor(score);
+  requestAnimationFrame(() => setTimeout(() => fill.setAttribute("stroke-dashoffset", circ-(score/100)*circ), 80));
 
   const v = verdictInfo(score);
-  $("verdict-tag").className   = "verdict-tag " + v.cls;
-  $("verdict-tag").textContent = v.label;
+  $("verdict-tag").className    = "verdict-tag "+v.cls;
+  $("verdict-tag").textContent  = v.label;
   $("verdict-text").textContent = v.text;
 
-  const dims = [
-    { key:"network",  scoreId:"dim-network-score",  barId:"dim-network-bar",  noteId:"dim-network-note",  max:35 },
-    { key:"content",  scoreId:"dim-content-score",  barId:"dim-content-bar",  noteId:"dim-content-note",  max:30 },
-    { key:"activity", scoreId:"dim-activity-score", barId:"dim-activity-bar", noteId:"dim-activity-note", max:20 },
-    { key:"profile",  scoreId:"dim-profile-score",  barId:"dim-profile-bar",  noteId:"dim-profile-note",  max:15 },
-  ];
-  dims.forEach(d => {
-    const dim = ai.dimensions?.[d.key];
-    if (!dim) return;
-    $(d.scoreId).textContent = `${dim.score} / ${d.max}`;
-    $(d.noteId).textContent  = dim.note || "";
-    requestAnimationFrame(() => setTimeout(() => {
-      $(d.barId).style.width = `${(dim.score/d.max)*100}%`;
-    }, 200));
+  [
+    {key:"network",  sId:"dim-network-score",  bId:"dim-network-bar",  nId:"dim-network-note",  max:35},
+    {key:"content",  sId:"dim-content-score",  bId:"dim-content-bar",  nId:"dim-content-note",  max:30},
+    {key:"activity", sId:"dim-activity-score", bId:"dim-activity-bar", nId:"dim-activity-note", max:20},
+    {key:"profile",  sId:"dim-profile-score",  bId:"dim-profile-bar",  nId:"dim-profile-note",  max:15},
+  ].forEach(d => {
+    const dim = ai.dimensions?.[d.key]; if (!dim) return;
+    $(d.sId).textContent = `${dim.score} / ${d.max}`;
+    $(d.nId).textContent = dim.note || "";
+    requestAnimationFrame(() => setTimeout(() => $(d.bId).style.width=`${(dim.score/d.max)*100}%`, 200));
   });
 
   $("analysis-text").textContent = ai.analysis || "—";
-  $("raw-pre").textContent = JSON.stringify({ profile, posts:(posts||[]).slice(0,3) }, null, 2);
+  $("raw-pre").textContent = JSON.stringify({profile, posts:(posts||[]).slice(0,3)}, null, 2);
   $("result-card").classList.remove("hidden");
 }
 
@@ -591,36 +484,44 @@ function renderResult(profile, posts, ai) {
 async function handleScan() {
   const raw = $("username-input").value.trim();
   if (!raw) { setError("請輸入帳號名稱"); return; }
-  const handle = raw.replace(/^@/, "");
+  const handle = raw.replace(/^@/,"");
 
   setError(null);
   $("result-card").classList.add("hidden");
   setScanning(true);
+  startTimer();
 
   try {
+    // Step 1: profile
     setStep(1);
-    setLoading("正在抓取帳號資料…", "透過 Apify 取得公開帳號資訊");
+    setLoading("正在抓取帳號資料…", "透過 Apify 取得公開帳號資訊（約 20–40 秒）");
     const profileItems = await apifyRun({ mode:"profile", usernames:[handle], maxPosts:1 });
     const profile = profileItems?.[0];
-    if (!profile) throw new Error(`找不到帳號 @${handle}，請確認帳號名稱是否正確`);
+    if (!profile) throw new Error(`找不到帳號 @${handle}，請確認帳號名稱`);
 
+    // Step 2: posts
     setStep(2);
-    setLoading("正在讀取近期貼文…", "抓取最近 25 篇貼文與互動數據");
+    setLoading("正在讀取近期貼文…", "抓取最近 25 篇貼文與互動數據（約 20–40 秒）");
+    startTimer();
     const posts = await apifyRun({ mode:"posts", usernames:[handle], maxPosts:25 });
 
+    // Step 3: AI
     setStep(3);
     setLoading("AI 正在分析中…", "對照四大維度計算風險評分");
+    startTimer();
     const ai = await analyzeWithClaude(profile, posts);
 
     setStep(4);
     setLoading(null);
     renderResult(profile, posts, ai);
+
   } catch(e) {
     setStep(0);
     setLoading(null);
     setError(e.message || "未知錯誤，請稍後再試");
   } finally {
     setScanning(false);
+    clearTimer();
   }
 }
 
@@ -631,10 +532,9 @@ $("username-input").addEventListener("keydown", e => {
 $("raw-btn").addEventListener("click", () => {
   const pre = $("raw-pre");
   const open = pre.classList.toggle("open");
-  $("raw-btn").textContent = (open ? "▲" : "▼") + " 原始資料";
+  $("raw-btn").textContent = (open?"▲":"▼")+" 原始資料";
 });
 
-// 初始化
 initScreen();
 </script>
 </body>
