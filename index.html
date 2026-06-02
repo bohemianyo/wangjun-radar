@@ -600,7 +600,7 @@ async function handleScan() {
   try {
     setStep(1);
     setLoading("正在抓取帳號資料…", "透過 Apify 取得公開帳號資訊");
-    const profileItems = await apifyRun({ mode:"profile", usernames:[handle], maxPosts:0 });
+    const profileItems = await apifyRun({ mode:"profile", usernames:[handle], maxPosts:1 });
     const profile = profileItems?.[0];
     if (!profile) throw new Error(`找不到帳號 @${handle}，請確認帳號名稱是否正確`);
 
